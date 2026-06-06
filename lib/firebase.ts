@@ -1,34 +1,21 @@
-import type { Auth } from 'firebase/auth';
-import type { Firestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCPDPm7v6z5R5AX6cJArSx35GIlPn2E5tE",
-  authDomain: "mememakerapp-ab054.firebaseapp.com",
-  projectId: "mememakerapp-ab054",
-  storageBucket: "mememakerapp-ab054.firebasestorage.app",
-  messagingSenderId: "639813316052",
-  appId: "1:639813316052:web:68a941b8a3249ff3cc3a41",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let _auth: Auth | null = null;
-let _db: Firestore | null = null;
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-export function getFirebaseAuth(): Auth {
-  if (!_auth) {
-    const { initializeApp, getApps, getApp } = require('firebase/app') as typeof import('firebase/app');
-    const { getAuth } = require('firebase/auth') as typeof import('firebase/auth');
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    _auth = getAuth(app);
-  }
-  return _auth;
-}
+export { app, auth, db };
 
-export function getFirebaseDb(): Firestore {
-  if (!_db) {
-    const { initializeApp, getApps, getApp } = require('firebase/app') as typeof import('firebase/app');
-    const { getFirestore } = require('firebase/firestore') as typeof import('firebase/firestore');
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    _db = getFirestore(app);
-  }
-  return _db;
-}
+export function getFirebaseAuth() { return auth; }
+export function getFirebaseDb() { return db; }

@@ -1,5 +1,5 @@
-const CLOUD_NAME = "ddqegtdp0";
-const UPLOAD_PRESET = "meme_maker_app";
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 
 export async function uploadToCloudinary(
   file: File,
