@@ -16,8 +16,8 @@ export interface MemeCanvasRef {
 export interface TextBlock {
   id: string;
   text: string;
-  x: number; // 0-1 normalized
-  y: number; // 0-1 normalized
+  x: number;
+  y: number;
   fontFamily: string;
   fontSize: number;
   textColor: string;
@@ -66,7 +66,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
     const [isDragOver, setIsDragOver] = useState(false);
     const loadedImageRef = useRef<HTMLImageElement | null>(null);
 
-    // Draw everything
     const draw = useCallback(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -75,7 +74,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Background / image
       if (loadedImageRef.current) {
         ctx.drawImage(loadedImageRef.current, 0, 0, canvas.width, canvas.height);
       } else {
@@ -88,7 +86,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
         ctx.fillText('Drop image here or upload', canvas.width / 2, canvas.height / 2);
       }
 
-      // Draw text blocks
       textBlocks.forEach((block) => {
         if (!block.text.trim()) return;
         const px = block.x * canvas.width;
@@ -114,7 +111,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
           ctx.fillText(line, px, y);
         });
 
-        // Selection indicator
         if (block.id === selectedId) {
           const metrics = ctx.measureText(lines[0]);
           const w = Math.min(metrics.width + 20, maxW + 20);
@@ -125,9 +121,8 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
           ctx.setLineDash([]);
         }
       });
-    }, [imageUrl, textBlocks, selectedId]);
+    }, [textBlocks, selectedId]);
 
-    // Load image when URL changes
     useEffect(() => {
       if (!imageUrl) {
         loadedImageRef.current = null;
@@ -145,13 +140,12 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
         draw();
       };
       img.src = imageUrl;
-    }, [imageUrl]);
+    }, [imageUrl, draw]);
 
     useEffect(() => {
       draw();
     }, [draw]);
 
-    // Get canvas-relative normalized position
     const getNormPos = (e: React.MouseEvent | React.TouchEvent) => {
       const canvas = canvasRef.current;
       if (!canvas) return { x: 0, y: 0 };
@@ -172,7 +166,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
       };
     };
 
-    // Hit test — find which block was clicked
     const hitTest = (normX: number, normY: number): string | null => {
       const canvas = canvasRef.current;
       if (!canvas) return null;
@@ -205,8 +198,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
         setDragging(hit);
         setDragOffset({ x: pos.x - block.x, y: pos.y - block.y });
         onSelectBlock(hit);
-      } else {
-        // deselect — don't pass empty string, just pick nothing
       }
     };
 
@@ -218,7 +209,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
 
     const handleMouseUp = () => setDragging(null);
 
-    // Drag & drop file
     const handleDragOver = (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragOver(true);
@@ -235,9 +225,6 @@ const MemeCanvas = forwardRef<MemeCanvasRef, MemeCanvasProps>(
       downloadPng() {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        // Redraw without selection box
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
         canvas.toBlob((blob) => {
           if (!blob) return;
           const url = URL.createObjectURL(blob);

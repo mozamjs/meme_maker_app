@@ -371,8 +371,7 @@ export default function TextControls({
         {textBlocks.length === 0 && (
           <div className="text-center py-6 text-zinc-400">
             <p className="text-2xl mb-1">✏️</p>
-            <p className="text-xs">Click "Add Text" to add text anywhere on the meme</p>
-          </div>
+<p className="text-xs">Click &quot;Add Text&quot; to add text anywhere on the meme</p>          </div>
         )}
 
         <div className="flex flex-col gap-2">
